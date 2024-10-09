@@ -10,7 +10,7 @@ jobs:
   steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '16.x' # Specify the Node.js version you want to use
+        versionSpec: '20.x' # Ensure this version is available
       displayName: 'Install Node.js'
 
 - job: Client_Build_And_Run
@@ -19,13 +19,13 @@ jobs:
   steps:
     - script: |
         cd client
-        npm install
-        npm run build
+        npm install # Ensure package.json exists and dependencies are correct
+        npm run build # Ensure build script is defined in package.json
       displayName: 'Install and Build Client'
 
     - task: CopyFiles@2
       inputs:
-        SourceFolder: 'client/.next'
+        SourceFolder: 'client/.next' # Ensure .next directory exists after build
         Contents: '**'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/client'
       displayName: 'Copy Client Files to Staging Directory'
@@ -42,12 +42,12 @@ jobs:
   steps:
     - script: |
         cd server
-        npm install
+        npm install # Ensure package.json exists and dependencies are correct
       displayName: 'Install Server Dependencies'
 
     - task: CopyFiles@2
       inputs:
-        SourceFolder: 'server'
+        SourceFolder: 'server' # Ensure server directory exists
         Contents: '**'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/server'
       displayName: 'Copy Server Files to Staging Directory'
