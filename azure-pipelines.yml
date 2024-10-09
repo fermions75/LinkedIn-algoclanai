@@ -1,0 +1,59 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: Install_Node
+  displayName: 'Install Node.js'
+  steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '16.x' # Specify the Node.js version you want to use
+      displayName: 'Install Node.js'
+
+- job: Client_Build_And_Run
+  displayName: 'Build Client (Next.js) and Prepare for CD'
+  dependsOn: Install_Node
+  steps:
+    - script: |
+        cd client
+        npm install
+        npm run build
+      displayName: 'Install and Build Client'
+
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'client/.next'
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/client'
+      displayName: 'Copy Client Files to Staging Directory'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/client'
+        ArtifactName: 'client'
+      displayName: 'Publish Client Artifacts'
+
+- job: Server_Run_And_CD
+  displayName: 'Run Server (Node.js) and Prepare for CD'
+  dependsOn: Install_Node
+  steps:
+    - script: |
+        cd server
+        npm install
+      displayName: 'Install Server Dependencies'
+
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'server'
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/server'
+      displayName: 'Copy Server Files to Staging Directory'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/server'
+        ArtifactName: 'server'
+      displayName: 'Publish Server Artifacts'
