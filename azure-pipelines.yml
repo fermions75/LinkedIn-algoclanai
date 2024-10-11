@@ -27,12 +27,12 @@ jobs:
       inputs:
         SourceFolder: 'client/.next' # Ensure .next directory exists after build
         Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/client'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/release/client'
       displayName: 'Copy Client Files to Staging Directory'
 
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)/client'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/release/client'
         ArtifactName: 'client'
       displayName: 'Publish Client Artifacts'
 
@@ -49,11 +49,11 @@ jobs:
       inputs:
         SourceFolder: 'server' # Ensure server directory exists
         Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/server'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/release/server'
       displayName: 'Copy Server Files to Staging Directory'
 
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)/server'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/release/server'
         ArtifactName: 'server'
       displayName: 'Publish Server Artifacts'
