@@ -23,19 +23,6 @@ jobs:
         npm run build # Ensure build script is defined in package.json
       displayName: 'Install and Build Client'
 
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: 'client/.next' # Ensure .next directory exists after build
-        Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/release/client'
-      displayName: 'Copy Client Files to Staging Directory'
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)/release/client'
-        ArtifactName: 'client'
-      displayName: 'Publish Client Artifacts'
-
 - job: Server_Run_And_CD
   displayName: 'Run Server (Node.js) and Prepare for CD'
   dependsOn: Install_Node
@@ -45,15 +32,23 @@ jobs:
         npm install # Ensure package.json exists and dependencies are correct
       displayName: 'Install Server Dependencies'
 
+- job: copy_publish_artifacts
+  displayName: 'Copy and Publish Artifacts'
+  dependsOn: 
+    - Client_Build_And_Run
+    - Server_Run_And_CD
+  steps:
     - task: CopyFiles@2
       inputs:
-        SourceFolder: 'server' # Ensure server directory exists
-        Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/release/server'
-      displayName: 'Copy Server Files to Staging Directory'
-
+        Contents: |
+          client/**
+          server/**
+        TargetFolder: $(Build.ArtifactStagingDirectory)
+      displayName: 'Copy Artifacts to Final Directory'
+    
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)/release/server'
-        ArtifactName: 'server'
-      displayName: 'Publish Server Artifacts'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'release'
+        publishLocation: 'Container'
+      displayName: 'Publish Final Artifacts'
