@@ -33,6 +33,7 @@ steps:
     workingDir: 'client'
     customCommand: 'run build'
 
+
 - task: CopyFiles@2
   inputs:
     Contents: |
